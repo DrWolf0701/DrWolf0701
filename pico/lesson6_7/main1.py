@@ -1,12 +1,13 @@
 #import machine
 #import time #後來沒用到time
-from machine import Timer, ADC, Pin, PWM
+from machine import Timer, ADC, Pin, PWM, RTC
 
 
 #adc = machine.ADC(4) #machine裡面有乙個ADC class，用adc控制ADC實體
 adc = ADC(4)
 pwm=PWM(Pin(15),freq=2000) #Pin(15)是LED
 conversion_factor = 3.3 / (65535) #3.3V轉換, 參考老師的講議pico_W/一般操作/0_5內建溫度感測器(ADC)/
+rtc=RTC()
 
 '''
 while True: #無限迴圈讓它永遠做
@@ -19,6 +20,10 @@ while True: #無限迴圈讓它永遠做
 def do_thing(t): #t代表Timer的實體
     reading = adc.read_u16() * conversion_factor #內鍵的溫度感測器，連做都不用做
     temperature = 27 - (reading -0.706)/0.001721
+    year,month,day,weekday, hours, minutes, seconds,info = rtc.datetime()
+    datetime_str = f"{year}-{month}-{day} {hours}:{minutes}:{seconds}"
+    print(datetime_str)
+    #print(rtc.datetime()) #tuple是把一組數值暫時包在一起
     print(temperature)
 
 def do_thing1(t):
