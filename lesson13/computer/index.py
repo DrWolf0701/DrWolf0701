@@ -1,7 +1,26 @@
 import paho.mqtt.client as mqtt
+from datetime import datetime
+import os, csv
 
-def record(): #有改變的時候才記錄，先做一個LED
-    pass
+def record(r):
+    root_dir = os.getcwd()
+    data_dir = os.path.join(root_dir, 'data')
+    if not os.path.isdir(data_dir):    
+            os.mkdir('data')
+    
+    today = datetime.today()
+    filename = today.strftime("%Y-%m-%d") + ".csv"
+    #get_file_abspath
+    full_path = os.path.join(data_dir,filename)
+    if not os.path.exists(full_path):
+        #沒有這個檔,建立檔案
+        print('沒有這個檔')
+        with open(full_path,mode='w',encoding='utf-8',newline='') as file:
+            file.write('時間,設備,值\n')
+    
+    with open(full_path, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(r)
 
 def on_connect(client, userdata, flags, reason_code, properties):
     # print(f"Connected with result code {reason_code}")
@@ -18,9 +37,13 @@ def on_message(client, userdata, msg):
     if topic == 'SA-35/LED_LEVEL':
         led_value = int(value) #已知傳回來會是整數，所以轉為整數
         
-        if led_value != led_origin_value: #不等於時保留
+        if led_value != led_origin_value: #不等於時保留(記錄)
             led_origin_value = led_value #(重要)如果沒global就會變區域變數
             print(f'led_value:{(led_value)}')
+            today = datetime.today()
+            now_str = today.strftime('%Y-%m-%d %H:%M%S')
+            save_data = [now_str,"SA-35/LED_LEVEL",led_origin_value] #有改變的時候希望傳出來的是一個list
+            record(save_data)   
     # print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
 
 def main():
