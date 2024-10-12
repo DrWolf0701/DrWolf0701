@@ -18,7 +18,7 @@ def record(r):
         with open(full_path,mode='w',encoding='utf-8',newline='') as file:
             file.write('時間,設備,值\n')
     
-    with open(full_path, mode='a', newline='', encoding='utf-8') as file:
+    with open(full_path, mode='a', newline='', encoding='utf-8') as file: #a代表寫入，注意縮排
         writer = csv.writer(file)
         writer.writerow(r)
 
