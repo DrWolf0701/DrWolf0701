@@ -24,7 +24,7 @@ def record(r):
 
 def on_connect(client, userdata, flags, reason_code, properties):
     # print(f"Connected with result code {reason_code}")
-    # 在连接成功后订阅主题
+    # 在连接成功后订阅主题，只會執行乙次
     client.subscribe("SA-35/#")  # 替换为您想要订阅的主题
 
 # 定义消息接收回调函数
