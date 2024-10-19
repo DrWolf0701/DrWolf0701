@@ -3,12 +3,11 @@ from datetime import datetime
 import os, csv
 
 #def record(r:list[str,str,int]): #型別的提示，告訴你傳的是list，也可以只寫r:list，function的說明有寫沒寫都沒關係
-def record(date:str,topic:str,value:int): #上面的寫法比較笨
+def record(topic:str,value:int|float|SyntaxWarning): #上面的寫法比較笨，|或的意思
     '''
     檢查是否有data資料夾,沒有就建立data資料夾
     取得今天日期,如果沒有今天日期.csv,就建立一個全新的今天日期.csv
     將參數r也就是list儲存進csv檔案內
-    parameters date:str ->這是日期
     parameters topic:str ->這是訂閱的topic
     parameters value:int ->這是訂閱的value
     '''
@@ -19,6 +18,7 @@ def record(date:str,topic:str,value:int): #上面的寫法比較笨
     
     today = datetime.today()
     current_str = today.strftime("%Y-%m-%d %H:%M:%S")
+    date = today.strftime("%Y-%m-%d")
     filename = date +".csv"
     #get_file_abspath
     full_path = os.path.join(data_dir,filename)
@@ -42,6 +42,7 @@ def on_message(client, userdata, msg):
     #payload代表value ; msg代表topic
     global led_origin_value #(重要)宣告function裡面的是全域變數
     global temperature_origin_value
+    global light_origin_status
     topic = msg.topic #一定是字串
     value = msg.payload.decode() #不確性是什麼, 可print(type(value))
     #led_origin_value = 0 #function裡面建立的叫區域變數，執行完就被消滅了，所以不在這裡建立
@@ -51,16 +52,25 @@ def on_message(client, userdata, msg):
         if led_value != led_origin_value: #不等於時保留(記錄)
             led_origin_value = led_value #(重要)如果沒global就會變區域變數
             print(f'led_value:{(led_value)}')
-            today = datetime.today()
+            today = datetime.now()
             now_str = today.strftime('%Y-%m-%d')
             #save_data = [now_str,"SA-35/LED_LEVEL",led_origin_value] #有改變的時候希望傳出來的是一個list
-            record(now_str,topic,led_value)
+            record(topic,led_value)
             # record(save_data)   
      # print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
     if topic == 'SA-35/TEMPERATURE':
+        temperature_value = float(value)
         if temperature_origin_value != value:
-           temperature_origin_value = value  
-           print(f'溫度{value}') #字串插補
+           temperature_origin_value = value
+           print(f'溫度:{value}')  
+           record(topic,temperature_value)
+
+    if topic == 'SA-35/LIGHT_LEVEL':
+        light_status = int(value)
+        if light_origin_status != value:
+           light_origin_status = value
+           print(f'燈源開關:{value}')  
+           record(topic,value)
 
 def main():
     # 创建MQTT客户端实例
@@ -78,8 +88,8 @@ def main():
     client.connect("192.168.0.252", 1883,60) #課堂上
     client.loop_forever()
 
-
 if __name__ ==  "__main__":
     led_origin_value = 0 #設定在這是全域變數
     temperature_origin_value = 0 #設定在這是全域變數
+    light_origin_status = None
     main()

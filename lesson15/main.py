@@ -26,8 +26,12 @@ def do_thing(t):
     mqtt.publish('SA-35/TEMPERATURE', f'{temperature}')
 
     adc_value = adc_light.read_u16()
-    print(f'光線:{adc_value}')
-    mqtt.publish('SA-35/LIGHT_LEVEL', f'{adc_value}')
+    #print(f'光線:{adc_value}')
+    #mqtt.publish('SA-35/LIGHT_LEVEL', f'{adc_value}')
+    light_state = '0' if adc_value < 4500 else '1' #關燈傳0,開燈傳1
+    print(f'燈源開關:{light_state}')
+    mqtt.publish('SA-35/LIGHT_LEVEL', f'{light_state}')
+    
     
 def do_thing1(t):
     '''
