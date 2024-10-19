@@ -41,7 +41,7 @@ def on_message(client, userdata, msg):
             led_origin_value = led_value #(重要)如果沒global就會變區域變數
             print(f'led_value:{(led_value)}')
             today = datetime.today()
-            now_str = today.strftime('%Y-%m-%d %H:%M%S')
+            now_str = today.strftime('%Y-%m-%d %H:%M:%S')
             save_data = [now_str,"SA-35/LED_LEVEL",led_origin_value] #有改變的時候希望傳出來的是一個list
             record(save_data)   
     # print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
