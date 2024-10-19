@@ -41,6 +41,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
 def on_message(client, userdata, msg):
     #payload代表value ; msg代表topic
     global led_origin_value #(重要)宣告function裡面的是全域變數
+    global temperature_origin_value
     topic = msg.topic #一定是字串
     value = msg.payload.decode() #不確性是什麼, 可print(type(value))
     #led_origin_value = 0 #function裡面建立的叫區域變數，執行完就被消滅了，所以不在這裡建立
@@ -55,7 +56,11 @@ def on_message(client, userdata, msg):
             #save_data = [now_str,"SA-35/LED_LEVEL",led_origin_value] #有改變的時候希望傳出來的是一個list
             record(now_str,topic,led_value)
             # record(save_data)   
-    # print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
+     # print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
+    if topic == 'SA-35/TEMPERATURE':
+        if temperature_origin_value != value:
+           temperature_origin_value = value  
+           print(f'溫度{value}') #字串插補
 
 def main():
     # 创建MQTT客户端实例
@@ -75,5 +80,6 @@ def main():
 
 
 if __name__ ==  "__main__":
-    led_origin_value = 0 #全域變數
+    led_origin_value = 0 #設定在這是全域變數
+    temperature_origin_value = 0 #設定在這是全域變數
     main()
