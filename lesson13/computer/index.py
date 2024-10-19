@@ -50,16 +50,16 @@ def main():
     # 创建MQTT客户端实例
     client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
     # 设置用户ID和密码
-    username = "homeassistant"  # 家
-    password = "s8824415"  #家
-    # username = "pi"  #課堂上
-    # password = "raspberry"  #課堂上
+    #username = "homeassistant"  # 家
+    #password = "s8824415"  #家
+    username = "pi"  #課堂上
+    password = "raspberry"  #課堂上
     client.username_pw_set(username, password)
     # 绑定回调函数
     client.on_connect = on_connect #有刮號代表執行，沒刮號代表註冊
     client.on_message = on_message
-    client.connect("192.168.1.127", 1883,60) #家
-    # client.connect("192.168.0.252", 1883,60) #課堂上
+    #client.connect("192.168.1.127", 1883,60) #家
+    client.connect("192.168.0.252", 1883,60) #課堂上
     client.loop_forever()
 
 
