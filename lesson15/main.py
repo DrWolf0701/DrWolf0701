@@ -70,4 +70,4 @@ if __name__ == '__main__':
         mqtt.connect()
         t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
         t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
-        main()
+    main()

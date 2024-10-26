@@ -10,7 +10,7 @@ led->gpio15
 from machine import Timer,ADC,Pin,PWM,RTC
 import binascii
 from umqtt.simple import MQTTClient
-import tools
+import tools, config
 
 
 def do_thing(t):
@@ -46,9 +46,14 @@ def do_thing1(t):
     mqtt.publish('SA-35/LED_LEVEL', f'{light_level}')
     
 def main():
-    pass
+    global blynk_mqtt
+    print(config.BLYNK_MQTT_BROKER) #server
+    print(config.BLYNK_TEMPLATE_ID) #user
+    print(config.BLYNK_AUTH_TOKEN)  #password
+    blynk_mqtt = MQTTClient(config.BLYNK_TEMPLATE_ID, config.BLYNK_MQTT_BROKER, user='device',password=config.BLYNK_AUTH_TOKEN)
+    blynk_mqtt.connect()
         
-if __name__ == '__main__':
+if __name__ == '__main__': #裡面的blynk_mqtt是全域變數
     adc = ADC(4) #內建溫度
     adc1 = ADC(Pin(26)) #可變電阻
     adc_light = ADC(Pin(28)) #光敏電阻
@@ -70,4 +75,5 @@ if __name__ == '__main__':
         mqtt.connect()
         t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
         t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
-        main()
+    blynk_mqtt = None
+    main()
