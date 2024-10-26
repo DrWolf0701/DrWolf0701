@@ -1,6 +1,24 @@
 import paho.mqtt.client as mqtt
 from datetime import datetime
 import os, csv
+import sqlite3
+from sqlite3 import Error
+
+def insert_to_sqlite(values):
+    try:
+        conn = sqlite3.connect('./data/pico.db') #這連線如果失敗會raise錯誤訊息
+    except Exception as e:
+        print(e)
+        return #break無法跳出要用return
+    sql = """
+    INSERT INTO 雞舍(時間,設備,值)
+    VALUES(?,?,?)
+    """
+    cursor = conn.cursor() 
+    cursor.execute(sql,values) #執行命令 values 是一個 tuple
+    conn.commit() #提交
+    cursor.close() #關閉不要浪費資源
+    conn.close()
 
 #def record(r:list[str,str,int]): #型別的提示，告訴你傳的是list，也可以只寫r:list，function的說明有寫沒寫都沒關係
 def record(topic:str,value:int|float|SyntaxWarning): #上面的寫法比較笨，|或的意思
@@ -31,6 +49,7 @@ def record(topic:str,value:int|float|SyntaxWarning): #上面的寫法比較笨�
     with open(full_path, mode='a', newline='', encoding='utf-8') as file: #a代表寫入，注意縮排
         writer = csv.writer(file)
         writer.writerow([current_str,topic,value])
+        insert_to_sqlite((current_str,topic,float(value))) #插入資料庫
 
 def on_connect(client, userdata, flags, reason_code, properties):
     # print(f"Connected with result code {reason_code}")
