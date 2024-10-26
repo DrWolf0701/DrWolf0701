@@ -24,6 +24,7 @@ def do_thing(t):
     temperature = round(27 - (reading - 0.706)/0.001721,2)#round是micropython內鍵function
     print(f'溫度:{temperature}') 
     mqtt.publish('SA-35/TEMPERATURE', f'{temperature}')
+    blynk_mqtt.publish('ds/termperature',f'{temperature}')
 
     adc_value = adc_light.read_u16()
     #print(f'光線:{adc_value}')
@@ -31,7 +32,7 @@ def do_thing(t):
     light_state = '0' if adc_value < 4500 else '1' #關燈傳0,開燈傳1
     print(f'燈源開關:{light_state}')
     mqtt.publish('SA-35/LIGHT_LEVEL', f'{light_state}')
-    
+    blynk_mqtt.publish('ds/light_state',f'{light_state}')
     
 def do_thing1(t):
     '''
@@ -44,14 +45,16 @@ def do_thing1(t):
     light_level = round(duty/65535*10)
     print(f'可變電阻:{light_level}')
     mqtt.publish('SA-35/LED_LEVEL', f'{light_level}')
+    blynk_mqtt.publish('ds/led_level',f'{light_level}') #led_level是要看Blynk Develop Datastreams
     
 def main():
     global blynk_mqtt
     print(config.BLYNK_MQTT_BROKER) #server
     print(config.BLYNK_TEMPLATE_ID) #user
     print(config.BLYNK_AUTH_TOKEN)  #password
-    blynk_mqtt = MQTTClient(config.BLYNK_TEMPLATE_ID, config.BLYNK_MQTT_BROKER, user='device',password=config.BLYNK_AUTH_TOKEN)
+    blynk_mqtt = MQTTClient(config.BLYNK_TEMPLATE_ID, config.BLYNK_MQTT_BROKER, user='device',password=config.BLYNK_AUTH_TOKEN,keepalive=60)
     blynk_mqtt.connect()
+    #print(blynk_mqtt.connect())
         
 if __name__ == '__main__': #裡面的blynk_mqtt是全域變數
     adc = ADC(4) #內建溫度
