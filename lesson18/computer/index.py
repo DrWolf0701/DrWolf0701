@@ -1,3 +1,4 @@
+#Lesson18 index.py 是將在本機訂閱的資料存進SQL DB
 import paho.mqtt.client as mqtt
 from datetime import datetime
 import os, csv
